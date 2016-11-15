@@ -3,6 +3,7 @@
 """
 TattDL detector
 harry.sun@kitware.com
+paul.tunison@kitware.com
 """
 
 import _init_paths
@@ -10,7 +11,7 @@ from fast_rcnn.config import cfg
 from fast_rcnn.test import im_detect
 from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 import caffe, os, sys, cv2
@@ -34,37 +35,37 @@ NETS = {'vgg16': ('VGG16',
         'zf': ('ZF',
                   'ZF_faster_rcnn_final.caffemodel')}
 
-def vis_detections(im, class_name, dets, thresh=0.5):
-    """Draw detected bounding boxes."""
-    if len(dets) == 0:
-        return
-
-    im = im[:, :, (2, 1, 0)]
-    ax=plt.gca()
-    ax.imshow(im, aspect='equal')
-
-    for i in range(len(dets)):
-        bbox = dets[i, :4]
-        score = dets[i, -1]
-
-        print(bbox, score)
-
-        ax.add_patch(
-            plt.Rectangle((bbox[0], bbox[1]),
-                          bbox[2] - bbox[0],
-                          bbox[3] - bbox[1], fill=False,
-                          edgecolor='red', linewidth=3.5)
-            )
-        ax.text(bbox[0], bbox[1] - 2,
-                '{:s} {:.3f}'.format(class_name, score),
-                bbox=dict(facecolor='blue', alpha=0.5),
-                fontsize=14, color='white')
-
-    ax.set_title(('{} detections with '
-                  'p({} | box) >= {:.1f}').format(class_name, class_name, thresh), fontsize=14)
-    plt.axis('off')
-    plt.tight_layout()
-    plt.draw()
+#def vis_detections(im, class_name, dets, thresh=0.5):
+#    """Draw detected bounding boxes."""
+#    if len(dets) == 0:
+#        return
+#
+#    im = im[:, :, (2, 1, 0)]
+#    ax=plt.gca()
+#    ax.imshow(im, aspect='equal')
+#
+#    for i in range(len(dets)):
+#        bbox = dets[i, :4]
+#        score = dets[i, -1]
+#
+#        print(bbox, score)
+#
+#        ax.add_patch(
+#            plt.Rectangle((bbox[0], bbox[1]),
+#                          bbox[2] - bbox[0],
+#                          bbox[3] - bbox[1], fill=False,
+#                          edgecolor='red', linewidth=3.5)
+#            )
+#        ax.text(bbox[0], bbox[1] - 2,
+#                '{:s} {:.3f}'.format(class_name, score),
+#                bbox=dict(facecolor='blue', alpha=0.5),
+#                fontsize=14, color='white')
+#
+#    ax.set_title(('{} detections with '
+#                  'p({} | box) >= {:.1f}').format(class_name, class_name, thresh), fontsize=14)
+#    plt.axis('off')
+#    plt.tight_layout()
+#    plt.draw()
 
 def tattoo_detection(net, image_name, args):
     """Detect object classes in an image using pre-computed object proposals."""
@@ -75,7 +76,7 @@ def tattoo_detection(net, image_name, args):
         raise ValueError('cannot open %s for read' % image_name )
 
     rows,cols = im_in.shape[:2]
-    print([rows,cols])
+    #print([rows,cols])
 
     min_w, min_h = (args.min_width, args.min_height)
     if rows < min_h or cols < min_w:
@@ -99,8 +100,8 @@ def tattoo_detection(net, image_name, args):
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
 
     max_scores = scores.max(axis=0)
-    print(max_scores)
-    print(boxes.shape)
+    #print(max_scores)
+    #print(boxes.shape)
 
     # Visualize detections for each class
     CONF_THRESH = args.threshold
@@ -118,15 +119,15 @@ def tattoo_detection(net, image_name, args):
         inds = np.where(dets[:, -1] >= CONF_THRESH)[0]
         dets_filter = dets[inds]
 
-        vis_detections(im, cls, dets_filter, thresh=CONF_THRESH)
+        #vis_detections(im, cls, dets_filter, thresh=CONF_THRESH)
 
         if cls == 'tattoo' and len(dets_filter)>0:
-            plt.savefig(os.path.join(args.output, os.path.splitext(os.path.basename(image_name))[0] + '_det.png'))
+            #plt.savefig(os.path.join(args.output, os.path.splitext(os.path.basename(image_name))[0] + '_det.png'))
             tattoo_dets = dets_filter
 
-    if args.inspect == 'v':
-        plt.show()
-    plt.clf()
+    #if args.inspect == 'v':
+    #    plt.show()
+    #plt.clf()
 
     return tattoo_dets, max_scores, seconds, scale
 
@@ -201,7 +202,7 @@ if __name__ == '__main__':
     else:
         raise ValueError("A set of image paths must be given!")
 
-    plt.figure(9999,figsize=(12, 12))
+    #plt.figure(9999,figsize=(12, 12))
     with open(os.path.join( args.output, 'detection.txt'), 'w') as fid:
         for im_name in im_names:
             print('~~~~~~ Detection for {}'.format(im_name))
@@ -216,14 +217,14 @@ if __name__ == '__main__':
                 text = '%s%f,' % (text,s)
             text = text + '|'
             for d in dets:
-                print(d)
+                #print(d)
                 roi=d[:4]
                 r=[int(0.5+x/scale) for x in roi]
                 score=d[-1]
                 text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
             text = '%s\n' % text
 
-            print(text)
+            #print(text)
             fid.write(text)
 
 #python /home/sun/prog/fastercnn/src/tools/TattDL_detector.py -o /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output -t 0.2 -v v -i img_005.jpg
