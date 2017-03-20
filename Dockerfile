@@ -9,7 +9,7 @@ RUN rm /bin/sh \
                        libboost-all-dev \
                        libprotobuf-dev protobuf-compiler \
                        libgoogle-glog-dev libgflags-dev \
-                       libhdf5-{serial,}dev \
+                       libhdf5-serial-dev libhdf5-dev \
                        libopencv-dev \
                        liblmdb-dev \
                        libleveldb-dev \
