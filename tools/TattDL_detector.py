@@ -195,7 +195,7 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(net, im)
 
-    plt.figure(9999,figsize=(12, 12))
+    #plt.figure(9999,figsize=(12, 12))
     with open(sys.stdout, 'w') as fid:
         for root, dirs, files in os.walk('/images'):
             for filename in files:
