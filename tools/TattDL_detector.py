@@ -196,30 +196,29 @@ if __name__ == '__main__':
         _, _= im_detect(net, im)
 
     #plt.figure(9999,figsize=(12, 12))
-    with open(sys.stdout, 'w') as fid:
-        for root, dirs, files in os.walk('/images'):
-            for filename in files:
-                im_name = os.path.join(root, filename)
+    for root, dirs, files in os.walk('/images'):
+        for filename in files:
+            im_name = os.path.join(root, filename)
 
-                try:
-                    dets, scores, seconds, scale = tattoo_detection(net, im_name, args)
-                except ValueError, ex:
-                    print("! Error processing image: %s" % str(ex), file=sys.stderr)
-                    continue
+            try:
+                dets, scores, seconds, scale = tattoo_detection(net, im_name, args)
+            except ValueError, ex:
+                print("! Error processing image: %s" % str(ex), file=sys.stderr)
+                continue
 
-                text = '%s|%.3f|%f|' % (os.path.basename(im_name),float(seconds),float(scale))
-                for s in scores:
-                    text = '%s%f,' % (text,s)
-                text = text + '|'
-                for d in dets:
-                    fid.write(d)
-                    roi=d[:4]
-                    r=[int(0.5+x/scale) for x in roi]
-                    score=d[-1]
-                    text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
-                text = '%s\n' % text
+            text = '%s|%.3f|%f|' % (os.path.basename(im_name),float(seconds),float(scale))
+            for s in scores:
+                text = '%s%f,' % (text,s)
+            text = text + '|'
+            for d in dets:
+                print(d)
+                roi=d[:4]
+                r=[int(0.5+x/scale) for x in roi]
+                score=d[-1]
+                text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
+            text = '%s\n' % text
 
-                fid.write(text)
+            print(text)
 
 #python /home/sun/prog/fastercnn/src/tools/TattDL_detector.py -o /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output -t 0.2 -v v -i img_005.jpg
 
