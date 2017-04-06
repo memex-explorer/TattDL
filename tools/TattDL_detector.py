@@ -5,7 +5,7 @@ TattDL detector
 harry.sun@kitware.com
 paul.tunison@kitware.com
 """
-
+from __future__ import print_function
 import _init_paths
 from fast_rcnn.config import cfg
 from fast_rcnn.test import im_detect
@@ -168,13 +168,13 @@ if __name__ == '__main__':
     cfg.TEST.RPN_POST_NMS_TOP_N = 5000 #20000
 
     args = parse_args()
-    print(args)
+    print(args, file=sys.stderr)
 
     prototxt = os.path.join(cfg.ROOT_DIR, 'models', NETS[args.demo_net][0], 'faster_rcnn_end2end', 'test.prototxt')
-    print(prototxt)
+    print(prototxt, file=sys.stderr)
 
     caffemodel = os.path.join(cfg.ROOT_DIR, 'data', 'faster_rcnn_models', NETS[args.demo_net][1])
-    print(caffemodel)
+    print(caffemodel, file=sys.stderr)
 
     if not os.path.isfile(caffemodel):
         raise IOError(('{:s} not found.\nDid you run ./data/script/'
@@ -188,46 +188,39 @@ if __name__ == '__main__':
         cfg.GPU_ID = args.gpu_id
     net = caffe.Net(prototxt, caffemodel, caffe.TEST)
 
-    print '\n\nLoaded network {:s}'.format(caffemodel)
+    print('\n\nLoaded network {:s}'.format(caffemodel), file=sys.stderr)
 
     # Warmup on a dummy image
     im = 128 * np.ones((300, 500, 3), dtype=np.uint8)
     for i in xrange(2):
         _, _= im_detect(net, im)
 
-    if args.list and os.path.isfile(args.list):
-        im_names = ( ln.strip() for ln in open(args.list) )
-    elif os.path.isdir(args.fname):
-        im_names = sorted(glob.glob( os.path.join( args.fname, '*.jpg')))
-    else:
-        raise ValueError("A set of image paths must be given!")
+    plt.figure(9999,figsize=(12, 12))
+    with open(sys.stdout, 'w') as fid:
+        for root, dirs, files in os.walk('/images'):
+            for filename in files:
+                im_name = os.path.join(root, filename)
 
-    #plt.figure(9999,figsize=(12, 12))
-    with open(os.path.join( args.output, 'detection.txt'), 'w') as fid:
-        for im_name in im_names:
-            print('~~~~~~ Detection for {}'.format(im_name))
-            try:
-                dets, scores, seconds, scale = tattoo_detection(net, im_name, args)
-            except ValueError, ex:
-                print "! Error processing image: %s" % str(ex)
-                continue
+                try:
+                    dets, scores, seconds, scale = tattoo_detection(net, im_name, args)
+                except ValueError, ex:
+                    print("! Error processing image: %s" % str(ex), file=sys.stderr)
+                    continue
 
-            text = '%s|%.3f|%f|' % (os.path.basename(im_name),float(seconds),float(scale))
-            for s in scores:
-                text = '%s%f,' % (text,s)
-            text = text + '|'
-            for d in dets:
-                #print(d)
-                roi=d[:4]
-                r=[int(0.5+x/scale) for x in roi]
-                score=d[-1]
-                text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
-            text = '%s\n' % text
+                text = '%s|%.3f|%f|' % (os.path.basename(im_name),float(seconds),float(scale))
+                for s in scores:
+                    text = '%s%f,' % (text,s)
+                text = text + '|'
+                for d in dets:
+                    fid.write(d)
+                    roi=d[:4]
+                    r=[int(0.5+x/scale) for x in roi]
+                    score=d[-1]
+                    text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
+                text = '%s\n' % text
 
-            #print(text)
-            fid.write(text)
+                fid.write(text)
 
 #python /home/sun/prog/fastercnn/src/tools/TattDL_detector.py -o /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output -t 0.2 -v v -i img_005.jpg
 
 #exec &> >(tee -a /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output/TattDL_detector.log); python TattDL_detector.py -o /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output -t 0.2 -v w -i /home/sun/z/data/tattc/tatt-c_ongoing/tattoo_detection/images
-
