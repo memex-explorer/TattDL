@@ -96,7 +96,8 @@ def tattoo_detection(net, image_name, args):
     scores, boxes = im_detect(net, im)
     timer.toc()
     seconds = '%.3f' % timer.total_time
-    print('Detection took {:.3f}s for {:d} object proposals'.format(timer.total_time, boxes.shape[0]))
+    print('Detection took {:.3f}s for {:d} object proposals'.format(timer.total_time, boxes.shape[0]),
+          file=sys.stderr)
 
     max_scores = scores.max(axis=0)
     #print(max_scores)
