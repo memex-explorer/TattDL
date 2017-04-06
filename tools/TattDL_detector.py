@@ -210,8 +210,9 @@ if __name__ == '__main__':
             for s in scores:
                 text = '%s%f,' % (text,s)
             text = text + '|'
+
             for d in dets:
-                print(d)
+                print(d, file=sys.stderr)
                 roi=d[:4]
                 r=[int(0.5+x/scale) for x in roi]
                 score=d[-1]
@@ -219,7 +220,3 @@ if __name__ == '__main__':
             text = '%s' % text
 
             print(text)
-
-#python /home/sun/prog/fastercnn/src/tools/TattDL_detector.py -o /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output -t 0.2 -v v -i img_005.jpg
-
-#exec &> >(tee -a /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output/TattDL_detector.log); python TattDL_detector.py -o /home/sun/prog/fastercnn/src/data/tattc_voc/032816/output -t 0.2 -v w -i /home/sun/z/data/tattc/tatt-c_ongoing/tattoo_detection/images
