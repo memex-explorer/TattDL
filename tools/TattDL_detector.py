@@ -216,7 +216,7 @@ if __name__ == '__main__':
                 r=[int(0.5+x/scale) for x in roi]
                 score=d[-1]
                 text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
-            text = '%s\n' % text
+            text = '%s' % text
 
             print(text)
 
