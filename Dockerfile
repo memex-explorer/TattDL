@@ -29,7 +29,7 @@ RUN apt-get install -y git-lfs
 RUN git clone --recursive --branch wip/remove-detector-matplotlib-use https://github.com/memex-explorer/TattDL.git
 
 WORKDIR /TattDL/lib
-RUN make
+RUN make -j$(nproc)
 
 WORKDIR /TattDL/caffe-fast-rcnn
 
@@ -41,8 +41,10 @@ RUN find . -type f -exec sed -i -e 's^"hdf5.h"^"hdf5/serial/hdf5.h"^g' -e 's^"hd
 RUN sed -i -e '/^LIBRARY_DIRS/s,$, /usr/lib/x86_64-linux-gnu/hdf5/serial,' Makefile.config
 
 # compile caffe
-RUN make && make pycaffe
+RUN make -j$(nproc) && make -j$(nproc) pycaffe
 
 WORKDIR /TattDL/data/scripts
 RUN ./fetch_faster_rcnn_models.sh && ./fetch_faster_rcnn_models.sh # this should be run twice
 RUN git lfs pull
+
+ENTRYPOINT ["python", "/TattDL/tools/TattDL_detector.py", "-o", "0"]
