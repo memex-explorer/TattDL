@@ -12,6 +12,7 @@ from fast_rcnn.test import im_detect
 from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
 #import matplotlib.pyplot as plt
+import csv
 import numpy as np
 import scipy.io as sio
 import caffe, os, sys, cv2
@@ -195,28 +196,24 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(net, im)
 
-    #plt.figure(9999,figsize=(12, 12))
+    writer = csv.writer(sys.stdout, delimiter=',', lineterminator='\n')
+    writer.writerow(['filename', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'])
+
     for root, dirs, files in os.walk('/images'):
         for filename in files:
             im_name = os.path.join(root, filename)
 
             try:
-                dets, scores, seconds, scale = tattoo_detection(net, im_name, args)
+                dets, _, _, scale = tattoo_detection(net, im_name, args)
             except ValueError, ex:
                 print("! Error processing image: %s" % str(ex), file=sys.stderr)
                 continue
 
-            text = '%s|%.3f|%f|' % (os.path.basename(im_name),float(seconds),float(scale))
-            for s in scores:
-                text = '%s%f,' % (text,s)
-            text = text + '|'
+            row = [os.path.basename(im_name)]
 
             for d in dets:
-                print(d, file=sys.stderr)
-                roi=d[:4]
-                r=[int(0.5+x/scale) for x in roi]
-                score=d[-1]
-                text = '%s%f,%d,%d,%d,%d ' % (text, score, r[0], r[1], r[2], r[3])
-            text = '%s' % text
+                roi = d[:4]
+                r = [int(0.5+x/scale) for x in roi]
+                score = d[-1]
 
-            print(text)
+                writer.writerow([os.path.basename(im_name), score] + r)
