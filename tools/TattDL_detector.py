@@ -68,6 +68,18 @@ NETS = {'vgg16': ('VGG16',
 #    plt.tight_layout()
 #    plt.draw()
 
+
+def draw_annotations(filename, annotations):
+    from PIL import Image, ImageDraw
+
+    source_img = Image.open(filename)
+    draw = ImageDraw.Draw(source_img)
+
+    for annotation in annotations:
+        draw.rectangle(annotation, fill=None, outline='red')
+
+    return source_img
+
 def tattoo_detection(net, image_name, args):
     """Detect object classes in an image using pre-computed object proposals."""
 
@@ -149,6 +161,8 @@ def parse_args():
     parser.add_argument('--cpu', dest='cpu_mode',
                         help='Use CPU mode (overrides --gpu)',
                         action='store_true')
+    parser.add_argument('-s', '--save-annotations', dest='save_annotations', help='Draw detections found to filename.annotated',
+                        default=False, action='store_true')
     parser.add_argument("-v", "--results", dest="inspect", help="v: visualize; w: write to detection file",
                         default="w", action="store")
     parser.add_argument('--net', dest='demo_net', help='Network to use [tattc_voc]',
@@ -210,6 +224,7 @@ if __name__ == '__main__':
                 continue
 
             row = [os.path.basename(im_name)]
+            annotations = []
 
             for d in dets:
                 roi = d[:4]
@@ -217,3 +232,10 @@ if __name__ == '__main__':
                 score = d[-1]
 
                 writer.writerow([os.path.basename(im_name), score] + r)
+
+                if args.save_annotations:
+                    annotations.append(((r[0], r[1]), (r[2], r[3])))
+
+            if args.save_annotations and len(annotations) > 0:
+                annotated_image = draw_annotations(im_name, annotations)
+                annotated_image.save('%s.annotated' % im_name, format=annotated_image.format)
