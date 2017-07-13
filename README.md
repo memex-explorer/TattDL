@@ -24,3 +24,20 @@ The boxes field (the last one) may container 0 or more confidence and bounding b
   confidence,x,y,width,height
 
 X and Y coordinates specify the upper left corner of the sub-region, assuming (0,0) is the upper left corner of the image.
+
+# Citation
+
+Please cite the following paper if you use this software in your work:
+
+```
+@inproceedings{sun2016tattoo,
+  title={Tattoo detection and localization using region-based deep learning},
+  author={Sun, Zhaohui H and Baumes, Jeff and Tunison, Paul and Turek, Matt and Hoogs, Anthony},
+  booktitle={Pattern Recognition (ICPR), 2016 23rd International Conference on},
+  pages={3055--3060},
+  year={2016},
+  organization={IEEE}
+}
+```
+Additionally, citing the JPL MEMEX project ```http://memex.jpl.nasa.gov/``` would be welcomed. 
+
